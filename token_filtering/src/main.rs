@@ -9,17 +9,6 @@ fn client() -> reqwest::Client {
         .expect("failed to create HTTP client")
 }
 
-async fn get_report_summary(mint: &str) -> Result<serde_json::Value, reqwest::Error> {
-    let url = format!("{}/v1/tokens/{}/report/summary", BASE_URL, mint);
-    let response = client()
-        .get(&url)
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
-    Ok(response)
-}
-
 async fn get_full_report(mint: &str) -> Result<serde_json::Value, reqwest::Error> {
     let url = format!("{}/v1/tokens/{}/report", BASE_URL, mint);
     let response = client()
@@ -45,17 +34,7 @@ async fn main() {
 
     println!("starting rug pull check for {}", mint);
 
-    println!("\n========== REPORT SUMMARY ==========");
-    match get_report_summary(mint).await {
-        Ok(response) => {
-            println!("{}", serde_json::to_string_pretty(&response).unwrap());
-        }
-        Err(e) => {
-            eprintln!("failed to fetch summary: {}", e);
-        }
-    }
-
-    println!("\n========== FULL REPORT ==========");
+    println!("FULL REPORT");
     match get_full_report(mint).await {
         Ok(response) => {
             println!("{}", serde_json::to_string_pretty(&response).unwrap());
